@@ -45,64 +45,52 @@ function match() {
       noFuzzyTitleCityOrCodeCandidates++;
       return;
     }
-    counter++;
+    
 
     let codes = r._codeMatches || [];
-    if (codes) {
-      let titlesPerfect = r._fuzzyMatchPerfect || [];
-      let titlesGood = r._fuzzyMatchGood || [];
-      let titlesWeak = r._fuzzyMatchWeak || [];
-      let titles = r._titleMatches || [];
-      // let titles = r._fuzzyMatchWeak || [];
-      let countries = r._countryMatches || [];
-      let cities = r._cityMatches || [];
-      let countryCityMatches = r._countryCityMatches || [];
-      // let intersection = _.intersection(titles, countryCityMatches);
+    let titlesPerfect = r._fuzzyMatchPerfect || [];
+    let titlesGood = r._fuzzyMatchGood || [];
+    let titlesWeak = r._fuzzyMatchWeak || [];
+    let titles = r._titleMatches || [];
+    let countries = r._countryMatches || [];
+    let cities = r._cityMatches || [];
+    let countryCityMatches = r._countryCityMatches || [];
 
+    let unionedTitleMatches = _.union(titles, titlesPerfect, titlesGood, titlesWeak);
+    let intersection = _.intersection(unionedTitleMatches, countries);
+    if (intersection.length === 1) {
+      let grbioRecord = lookups.grbioMap[intersection[0]];
+      // if (grbioRecord.indexHerbariorumRecord) {
+        // r._grbioEquivalent = grbioRecord.key;
 
-      // if (_.concat(titles, titlesPerfect, titlesGood, titlesWeak, cities, codes).length === 0) {
-      //   if (Date.parse(r.dateModified) > Date.parse('2014-11-11')) {
-      //     counter++;
-      //     log(chalk.yellow(r.organization), chalk.red(r.code));
-      //     r._noFuzzyTitleCityOrCodeCandidates = true;
-      //   }
-      // }
-
-      let unionedTitleMatches = _.union(titles, titlesPerfect, titlesGood, titlesWeak);
-      let intersection = _.intersection(unionedTitleMatches);
-      if (intersection.length === 1) {
-        let grbioRecord = lookups.grbioMap[intersection[0]];
-        if (grbioRecord.indexHerbariorumRecord) {
-          // r._grbioEquivalent = grbioRecord.key;
-
-          if (grbioMatchLookup[grbioRecord.key]) {
-            // log('already used for', chalk.blue('http://sweetgum.nybg.org/science/ih/herbarium-details/?irn=' + grbioMatchLookup[grbioRecord.key]));
-          } else {
-            log(chalk.blue('https://www.gbif.org/grscicoll/institution/' + grbioRecord.key));
-            log(chalk.blue('http://sweetgum.nybg.org/science/ih/herbarium-details/?irn=' + r.irn));
-            log(chalk.yellow(grbioRecord.name), chalk.red(grbioRecord.code), chalk.blue(grbioRecord._country));
-            log(chalk.yellow(r.organization), chalk.red(r.code), chalk.blue(r._country));
-            if (grbioRecord.additionalNames) {
-              console.log('additional names', grbioRecord.additionalNames);
-            }
-            console.log();
+        if (grbioMatchLookup[grbioRecord.key]) {
+          // log('already used for', chalk.blue('http://sweetgum.nybg.org/science/ih/herbarium-details/?irn=' + grbioMatchLookup[grbioRecord.key]));
+        } else {
+          log(chalk.blue('https://www.gbif.org/grscicoll/institution/' + grbioRecord.key));
+          log(chalk.blue('http://sweetgum.nybg.org/science/ih/herbarium-details/?irn=' + r.irn));
+          log(chalk.yellow(grbioRecord.name), chalk.red(grbioRecord.code), chalk.blue(grbioRecord._country));
+          log(chalk.yellow(r.organization), chalk.red(r.code), chalk.blue(r._country));
+          if (grbioRecord.additionalNames) {
+            console.log('additional names', grbioRecord.additionalNames);
           }
-          
           if (codes.length > 1) {
             console.log('more than one matching code');
           }
+          console.log();
         }
-      }
+
+        counter++;
+      // }
     }
   });
 
-  console.log('matched in this session', counter);
+  console.log('has any kind of title and country match', counter);
   console.log('matched records', matchedRecord);
   console.log('noFuzzyTitleCityOrCodeCandidates', noFuzzyTitleCityOrCodeCandidates);
   console.log('no decision taken', counter);
   helper.ensureUnique(ih);
 
-  // saveJson(ih, './ih/data/ihMatchesIterative3.json');
+  // saveJson(ih, './ih/data/ihMatchesIterative4.json');
 }
 
 match();
