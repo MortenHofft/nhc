@@ -307,6 +307,7 @@ function step11(institutions) {
 
 function step12(institutions) {
   let matched = [];
+  log('BEFORE: ', _.sumBy(institutions.filter(x => x.matchTo), 'occurrences'));
   institutions.forEach(x => {
     //filter for this query
     if (x.occurrences < 100000) return;
@@ -315,16 +316,16 @@ function step12(institutions) {
     if (x._blocked) return;
 
     if (union.length >= 1) {
-    //   let grbio = lookups.grbioMap[intersection[0]];
+      let grbio = lookups.grbioMap[union[0]];
       matched.push(x);
-    //   x.matchTo = grbio.key;
-    //   x.matchfromCode = x.institutioncode;
+      x.matchTo = grbio.key;
+      x.matchfromCode = x.institutioncode;
       log(chalk.yellow(x.datasetTitle), chalk.green(x.institutioncode), '\t', chalk.red(x.publisherTitle), '\t', chalk.blue(grbio.name), '\t', chalk.green(grbio.code), '\t', chalk.green(x.occurrences));
     }
   });
   log(_.sumBy(matched, 'occurrences'));
   log(_.uniqBy(matched, 'publishingorgkey').length);
-  log(_.sumBy(institutions.filter(x => x.matchTo), 'occurrences'));
+  log('AFTER: ', _.sumBy(institutions.filter(x => x.matchTo), 'occurrences'));
   // saveJson(institutions, './occurrences/tmp/matching2.json');
 }
 
@@ -341,4 +342,4 @@ function step12(institutions) {
 // step11(institutions2);
 step12(institutions2);
 
-// log(_.sumBy(institutions2.filter(x => !x.matchTo), 'occurrences'));
+log('NOT MATCHED: ', _.sumBy(institutions2.filter(x => x.matchTo), 'occurrences'));
