@@ -340,6 +340,11 @@ function step12(institutions) {
 // step9(institutions2);
 // step10(institutions2);
 // step11(institutions2);
-step12(institutions2);
+// step12(institutions2);
 
-log('NOT MATCHED: ', _.sumBy(institutions2.filter(x => x.matchTo), 'occurrences'));
+log('MATCHED with tags: ', _.sumBy(institutions2.filter(x => x.matchTo), 'occurrences'));
+
+institutions2.filter(x => !x.matchTo).forEach(x => {
+  // if (x.occurrences < 100000) return;
+  log(chalk.yellow(x.datasetTitle), '\t', chalk.green(x.institutioncode || '-'), '\t', chalk.green(x.institutionid || '-'), '\t', chalk.red(x.publisherTitle), `\t`, chalk.green(x.occurrences));
+});

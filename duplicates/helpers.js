@@ -12,6 +12,7 @@ const instMap = _.keyBy(inst, 'key');
 
 const coll = require('./data/collNormalized.json');
 const collMap = _.keyBy(coll, 'key');
+const instToColl = getAsLookup(coll, 'institutionKey');
 
 function saveJson(o, name) {
   // fs.writeFile(name, JSON.stringify(o, null, 2), function (err) {
@@ -30,8 +31,9 @@ function saveJson(o, name) {
 
 
 function normalize(a, stopwordsPattern) {
-  stopwordsPattern = stopwordsPattern || /\b(the|to|from|of|de|and|at)\b/g;
-  a = a.toLowerCase().replace(/[,.&|/\-)(]/g, ' ').replace(stopwordsPattern, ' ').replace(/\s\s+/g, ' ');
+  // stopwordsPattern = stopwordsPattern || /\b(the|to|do|from|of|de|and|at|du|d|l|le|la|historie|history|natural|naturelle)\b/g;
+  stopwordsPattern = stopwordsPattern || /\b(the|to|do|from|of|de|and|at|in|du|d|l|le|la|et|for|di|del|y|des|da|der|fur|a|s|und|u|i|m|los|dos)\b/g;
+  a = a.toLowerCase().replace(/[,.&|/\-'")(]/g, ' ').replace(stopwordsPattern, ' ').replace(/\s\s+/g, ' ');
   a = a.split(' ').sort().join(' ').trim();
   return a;
 }
@@ -41,11 +43,12 @@ function stripDiacrits(str) {
 }
 
 // Create lookup maps
-function getAsLookup(collection, entryKey) {
+function getAsLookup(collection, entryKey, useObject) {
   let m = {};
   collection.forEach(x => {
-    if (typeof x[entryKey] === 'undefined') return;
-    m[x[entryKey]] = m[x[entryKey]] ? m[x[entryKey]].concat(x.key) : [x.key]
+    if (typeof x[entryKey] === 'undefined') return; 
+    const result = useObject ? x : x.key;
+    m[x[entryKey]] = m[x[entryKey]] ? m[x[entryKey]].concat(result) : [result]
   });
   return m;
 }
@@ -71,5 +74,6 @@ module.exports = {
   getAsLookup,
   reuseReport,
   instMap,
-  collMap
+  collMap,
+  instToColl
 }
